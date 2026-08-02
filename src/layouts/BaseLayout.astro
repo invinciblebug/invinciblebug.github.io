@@ -1,0 +1,106 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Schema from '../components/Schema.astro';
+import { SITE } from '../lib/constants';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  keywords?: string[];
+  canonical?: string;
+  robots?: string;
+  ogImage?: string;
+  schema?: Record<string, any> | Record<string, any>[];
+}
+
+const {
+  title,
+  description = SITE.description,
+  keywords = [...SITE.keywords],
+  canonical = SITE.url + Astro.url.pathname,
+  robots = 'index, follow',
+  ogImage = SITE.url + SITE.authorAvatar,
+  schema,
+} = Astro.props;
+
+const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+---
+
+<!doctype html>
+<html lang={SITE.language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content={SITE.theme} />
+    <meta name="author" content={SITE.author} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords.join(', ')} />
+    <meta name="robots" content={robots} />
+    <meta name="application-name" content={SITE.title} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={SITE.type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content={`${SITE.title} - ${description}`} />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${SITE.title} - ${description}`} />
+    <meta name="twitter:site" content="@invinciblebug" />
+    <meta name="twitter:creator" content="@invinciblebug" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href={canonical} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.title} RSS`} href={SITE.url + '/rss.xml'} />
+
+    <title>{fullTitle}</title>
+    {schema && <Schema schema={schema} />}
+
+    <script is:inline>
+      (function() {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 transition-colors">
+    <Header />
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<script>
+  import Swup from 'swup';
+
+  const swup = new Swup({
+    containers: ['main'],
+    animationSelector: '[data-swup]',
+  });
+
+  (window as any).__swup = swup;
+</script>

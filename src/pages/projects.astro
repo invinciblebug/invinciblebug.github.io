@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, LINKS, PROJECTS } from '../lib/constants';
+
+const publisherSchema = {
+  '@type': 'Organization',
+  name: SITE.title,
+  url: SITE.url,
+  logo: {
+    '@type': 'ImageObject',
+    url: SITE.url + SITE.authorAvatar,
+  },
+};
+
+const collectionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Projects',
+  description: 'Open source projects and software by Invincible Bug.',
+  url: SITE.url + '/projects',
+  author: { '@type': 'Person', name: SITE.author },
+};
+
+const pageDescription = 'Open source projects and software by Invincible Bug.';
+
+let repos: any[] = [];
+let error = false;
+try {
+  const res = await fetch('https://api.github.com/users/invinciblebug/repos?sort=updated&per_page=30');
+  if (res.ok) {
+    repos = await res.json();
+  } else {
+    error = true;
+  }
+} catch {
+  error = true;
+}
+
+function getRepoSchemas(repos: any[]) {
+  return repos.filter(r => !r.fork).map(repo => {
+    const sameAs = [repo.html_url];
+    if (repo.homepage && repo.homepage !== repo.html_url) {
+      sameAs.push(repo.homepage);
+    }
+
+    const isSmartSimulation = repo.name === 'SmartSimulation';
+    if (isSmartSimulation && !sameAs.includes(PROJECTS.smartSimulation.curseforge)) {
+      sameAs.push(PROJECTS.smartSimulation.curseforge);
+    }
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: repo.name,
+      description: repo.description || '',
+      url: repo.html_url,
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Cross-platform',
+      author: { '@type': 'Person', name: SITE.author },
+      publisher: publisherSchema,
+      sameAs: sameAs,
+      codeRepository: repo.html_url,
+      license: repo.license?.spdx_id || 'Proprietary',
+      softwareVersion: repo.default_branch,
+      dateModified: repo.updated_at,
+    };
+  });
+}
+
+const repoSchemas = getRepoSchemas(repos);
+const schemas = [collectionSchema, ...repoSchemas];
+---
+
+<BaseLayout
+  title="Projects"
+  description={pageDescription}
+  keywords={['projects', 'open source', 'utilities', 'tools', 'GitHub', 'Smart Simulation']}
+  schema={schemas}
+>
+  <div data-swup class="min-h-[calc(100vh-8rem)] flex flex-col">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold">Projects</h1>
+      <p class="text-neutral-500 dark:text-neutral-400 mt-2">Works by Invincible Bug.</p>
+    </div>
+
+    {error ? (
+      <div class="flex-1 flex items-center justify-center">
+        <div class="text-center py-16">
+          <svg class="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">Couldn't load projects</h2>
+          <p class="text-neutral-500 dark:text-neutral-400 mb-4">GitHub API is unavailable right now. Please try again later.</p>
+          <a href={LINKS.githubProfile + '?tab=repositories'} class="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:bg-neutral-700 dark:hover:bg-neutral-200 transition-colors" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    ) : repos.length === 0 ? (
+      <div class="flex-1 flex items-center justify-center">
+        <div class="text-center py-16">
+          <svg class="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">No projects yet</h2>
+          <p class="text-neutral-500 dark:text-neutral-400">Working on something. Check back soon.</p>
+        </div>
+      </div>
+    ) : (
+      <div class="space-y-4 flex-1">
+        {repos.filter(r => !r.fork).map((repo) => (
+          <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="block p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-semibold text-lg truncate">{repo.name}</h3>
+                  {repo.archived && (
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">Archived</span>
+                  )}
+                </div>
+                {repo.description && (
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 line-clamp-2">{repo.description}</p>
+                )}
+                <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+                  {repo.language && (
+                    <span class="flex items-center gap-1">
+                      <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                      {repo.language}
+                    </span>
+                  )}
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
+                    {repo.stargazers_count}
+                  </span>
+                  <span>{new Date(repo.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
