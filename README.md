@@ -4,8 +4,11 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3.3-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-brightgreen)
+[![GitHub Issues](https://img.shields.io/github/issues/invinciblebug/invinciblebug.github.io?style=flat-square&color=red)](https://github.com/invinciblebug/invinciblebug.github.io/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/invinciblebug/invinciblebug.github.io?style=flat-square&color=blue)](https://github.com/invinciblebug/invinciblebug.github.io/pulls)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/invinciblebug/invinciblebug.github.io?style=flat-square&color=orange)](https://github.com/invinciblebug/invinciblebug.github.io/commits/main)
 
-Personal portfolio and blog for Invincible Bug. Built with Astro, Tailwind CSS, and deployed to GitHub Pages.
+Personal portfolio and blog by Invincible Bug. Built with Astro, Tailwind CSS, and deployed to GitHub Pages.
 
 ## Features
 
