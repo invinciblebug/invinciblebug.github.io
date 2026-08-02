@@ -7,6 +7,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/invinciblebug/invinciblebug.github.io?style=flat-square&color=red)](https://github.com/invinciblebug/invinciblebug.github.io/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/invinciblebug/invinciblebug.github.io?style=flat-square&color=blue)](https://github.com/invinciblebug/invinciblebug.github.io/pulls)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/invinciblebug/invinciblebug.github.io?style=flat-square&color=orange)](https://github.com/invinciblebug/invinciblebug.github.io/commits/main)
+[![Hits](https://hits.sh/github.com/invinciblebug/invinciblebug.github.io.svg?label=Views)](https://hits.sh/github.com/invinciblebug/invinciblebug.github.io/)
 
 Personal portfolio and blog by Invincible Bug. Built with Astro, Tailwind CSS, and deployed to GitHub Pages.
 
